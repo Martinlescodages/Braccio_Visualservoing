@@ -5,6 +5,6 @@
 #include <Servo.h>
 
 // Déclaration de la fonction
-void moveArm(float t1, float t2, float t3, float t4);
+void moveArm(float t1, float t2, float t3, float t4,float dt);
 
 #endif // ARM_MOVEMENT_H
