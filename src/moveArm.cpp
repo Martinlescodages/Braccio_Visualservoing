@@ -8,17 +8,21 @@ Servo wrist_ver;
 Servo wrist_rot;
 Servo gripper;
 
-void moveArm(float t1, float t2, float t3, float t4) {
-    float scaleFactor = 50.0;  // Scale velocity to angle variation
+void moveArm(float t1, float t2, float t3, float t4,float dt) {
+
+    float deg1 = t1 * 180.0 / PI;
+    float deg2 = t2 * 180.0 / PI;
+    float deg3 = t3 * 180.0 / PI;
+    float deg4 = t4 * 180.0 / PI;
 
     // Convert velocity (or delta angle) to servo angles
-    int baseAngle     = constrain(90 + t4 * scaleFactor, 0, 180);  // t4: base rotation
-    int shoulderAngle = constrain(90 + t1 * scaleFactor, 15, 165);
-    int elbowAngle    = constrain(90 + t2 * scaleFactor, 0, 180);
-    int wristAngle    = constrain(90 + t3 * scaleFactor, 0, 180);
+    int baseAngle     = constrain(90 + deg1, 0, 180);  // t4: base rotation
+    int shoulderAngle = constrain(90 + deg2, 15, 165);
+    int elbowAngle    = constrain(90 + deg3, 0, 180);
+    int wristAngle    = constrain(90 + deg4, 0, 180);
 
     // Command all servos, fixed wrist_rot and gripper for now
-    Braccio.ServoMovement(10, baseAngle, shoulderAngle, elbowAngle, wristAngle, 90, 73);
+    Braccio.ServoMovement(dt, baseAngle, shoulderAngle, elbowAngle, wristAngle, 90, 73);
 /*
     // Debug
     Serial.print("Base Angle: "); Serial.print(baseAngle);
