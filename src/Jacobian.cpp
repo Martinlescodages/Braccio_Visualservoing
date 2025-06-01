@@ -5,14 +5,14 @@
 // Fonction jvplus : calcule le torseur cinématique r à partir de f (erreurs + primitives + centrageX)
 
 BLA::Matrix<4,1> BLA::jvplus(const BLA::Matrix<18,1>& f) {
-    const float Gx = 1000.0;
-    const float Gy = 1000.0;
-    const float z  = 0.5;
+    const float Gx = 947.37;
+    const float Gy = 947.37;
+    const float z  = 0.40;
 
     BLA::Matrix<8,3> J;
 
     // Construction du Jacobien image (8 lignes = 4 coins x (x,y))
-    for (int i = 0; i < 4; i++) {
+    for (float i = 0; i < 4; i++) {
         float x = f(8 + 2*i);     // f(8), f(10), f(12), f(14)
         float y = f(8 + 2*i + 1); // f(9), f(11), f(13), f(15)
 
@@ -28,26 +28,35 @@ BLA::Matrix<4,1> BLA::jvplus(const BLA::Matrix<18,1>& f) {
         J(r+1, 1) = y / z;
         J(r+1, 2) = (Gy * Gy + y * y) / Gy;
     }
+    //Serial.println("J:");
+    //Serial.println(J);
 
     // Pseudo-inverse : Jvp = (Jᵗ * J + λI)⁻¹ * Jᵗ
     BLA::Matrix<3,8> J_T = ~J;
     BLA::Matrix<3,3> JTJ = J_T * J;
 
-    float lambda = 0.01;
+    float lambda = 0.00001;
     BLA::Matrix<3,3> I = {1,0,0, 0,1,0, 0,0,1};
     BLA::Matrix<3,3> JTJ_reg = JTJ + lambda * I;
+       if (Determinant(JTJ_reg) == 0) {
+        Serial.println("Erreur : La matrice JTJ_reg n'est pas inversible.");
+        return BLA::Matrix<4,1>(); // Retourne une matrice vide ou gérer l'erreur
+    }
     BLA::Matrix<3,3> JTJ_inv = Inverse(JTJ_reg);
 
+
     BLA::Matrix<3,8> Jvp = JTJ_inv * J_T;
+
+    
 
     // Partie erreur d'image (f(0) à f(7))
     BLA::Matrix<8,1> err;
     for (int i = 0; i < 8; i++) {
         err(i) = f(i);
     }
-
+    
     BLA::Matrix<3,1> r_visuel = Jvp * err;
-
+    // Fonctione
     // Erreur centrage X (f(16)) → associée à t4
     float err_centre_x = f(16);
 
@@ -57,6 +66,10 @@ BLA::Matrix<4,1> BLA::jvplus(const BLA::Matrix<18,1>& f) {
     r(1) = r_visuel(1);
     r(2) = r_visuel(2);
     r(3) = err_centre_x;  // t4 (centrage en X de l’objet)
+    //Serial.println("r:");
+    //Serial.println(r);
+
+
 
     return r;
 }
