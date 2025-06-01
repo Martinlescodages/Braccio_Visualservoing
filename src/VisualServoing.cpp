@@ -10,9 +10,9 @@ void BLA::computeArticularVelocityFromVisualServoing(const BLA::Matrix<4,1>& r, 
     float centrageX = r(3); // erreur de centrage en X de l'objet
 
     // 2. Constantes géométriques
-    float a1 = 125.0;
-    float a2 = 125.0;
-    float a3 = 170.0;
+    float a1 = 0.1250;
+    float a2 = 0.1250;
+    float a3 = 0.1700;
 
     // 3. Jacobien géométrique dans le repère de la base
     BLA::Matrix<3,3> J_T0 = {
@@ -24,7 +24,7 @@ void BLA::computeArticularVelocityFromVisualServoing(const BLA::Matrix<4,1>& r, 
          a2 * cos(t1 + t2) + a3 * cos(t1 + t2 + t3),
          a3 * cos(t1 + t2 + t3),
 
-         1, 1, 1
+         0, 0, 0
     };
 
     BLA::Matrix<3,3> J_R0 = {
@@ -74,6 +74,16 @@ void BLA::computeArticularVelocityFromVisualServoing(const BLA::Matrix<4,1>& r, 
 
     // 9. Calcul de la vitesse articulaire (t1, t2, t3)
     BLA::Matrix<3,1> q_dot = J_inv * v;
+/*
+    Serial.print("q_dot: ");
+    Serial.print(q_dot(0)); Serial.print(" ");
+    Serial.print(q_dot(1)); Serial.print(" ");
+    Serial.println(q_dot(2));
+    Serial.print("centrage X: ");
+    Serial.println(centrageX);
+
+    */
+
 
     // 10. Intégration des angles articulaires
     t1 += q_dot(0) * dt;
